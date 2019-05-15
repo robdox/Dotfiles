@@ -1,0 +1,2 @@
+# vi mode
+bindkey -v

@@ -3,6 +3,17 @@ echo "Loading Rob's .zshrc"
 ANTIGEN_PATH=~/p/Dotfiles
 source $ANTIGEN_PATH/antigen/antigen.zsh
 
+antigen init $ANTIGEN_PATH/.antigenrc
+
+# TODO these need to be moved to the actual keybinds config file
+bindkey -v
+
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+
 for function in ~/.zsh/functions/*; do
   source $function
 done
