@@ -1,0 +1,672 @@
+# AutoUpdater Sourcing
+function download_new_zshrc() {
+    # Get Curl
+    [[ -e /usr/bin/curl ]] || sudo apt-get install -yyq curl
+
+    # Get script
+    echo "${iceblue}Getting newer .zshrc refresh...$NCC";
+    NEWCONF=$(curl lwb.co/.zshrc);
+    if [[ -e ~/.lwb_pkg ]]; then 
+
+    else
+      cd ~
+      touch ~/.lwb_pkg
+      source ~/.zshrc
+    fi
+    if [[ -z "$NEWCONF" ]] ; then
+        echo "${bred}Unable to download new zshrc! Check your internet!$NCC";
+    else
+        mv ~/.zshrc ~/.zshrc.bak
+        echo "$NEWCONF" > ~/.zshrc
+        echo "${iceblue}Loading .zshrc refresh...$NCC";
+        source ~/.zshrc;
+        return;
+    fi
+}
+if [[ -z "$(find ~/.zshrc -mtime -1)" && "$(hostname)" != "berlin" ]] ; then
+    download_new_zshrc
+fi
+source /etc/profile
+
+# aliases
+alias emacs="emacs -nw"
+alias e="emacs -nw"
+alias vim='nocorrect vim' 
+alias git='nocorrect git' 
+alias v="vim"
+alias vil='v *(.om[1]^D)'
+
+
+function locals_on() {
+  [[ -z "$1" ]] && match='*' || match="$1";
+  for f in $(find ~ -maxdepth 1 -name ".local_hosts.$match"); do
+	cat $f | while l=`line` do
+		echo "$l #LOCALS $f " | sudo tee -a /etc/hosts;
+	done;
+  done;
+}
+
+function locals_off() {
+  [[ -z "$1" ]] && match=".*" || match="$1";
+  grep -v "#LOCALS .*local_hosts\.$match" /etc/hosts | sudo tee /etc/hosts
+}
+
+function add_to_path()
+{
+    if [[ -z "$1" ]] ; then
+        dir=$(pwd)
+    else ; dir="$1" ; fi
+    echo "
+# AUTO add_to_path $dir
+export PATH=\$PATH:$dir" >> ~/.zshrc_local
+    echo "-> ${iceblue}Loading .zshrc_local refresh...$NCC";
+    source ~/.zshrc_local;
+}
+function pg {
+ps -ef | grep $* | grep -v grep
+}
+
+function zrc() {
+  vim ~/.zshrc 
+  echo "${magenta}Reloading .zshrc file...$NCC" 
+  source ~/.zshrc
+}
+function zrc_local() {
+  vim ~/.zshrc_local 
+  echo 'Reloading .zshrc file...' 
+  source ~/.zshrc
+}
+function sshc() {
+  vim ~/.ssh/config
+}
+function portknock() {
+  host="$1"
+  [[ -z "$host" ]] && exit;
+  shift
+  for x in $*; do nmap -Pn --host_timeout 201 --max-retries 0 -p $x $host; done
+}
+function rehostname() {
+ [[ -z "$1" ]] && return ;
+  sudo sed "s/$HOSTNAME/$1/g" -i.bak /etc/hosts /etc/hostname
+}
+function mkalias() {
+    N="$1"
+    CMD="$2"
+    tee -a ~/.zshrc_local <<EOF
+
+###### MKALIAS $N ######
+alias $N="$CMD"
+EOF
+echo 'Reloading .zshrc file...' 
+source ~/.zshrc
+
+}
+function wa() {
+  if [[ "$1" == "" ]]; then
+    wemux reset
+  else
+    wemux join $1
+  fi;
+  wemux
+}
+function install_wemux() {
+  sudo apt-get install -yyq git;
+  sudo git clone git://github.com/zolrath/wemux.git /usr/local/share/wemux
+  sudo ln -s /usr/local/share/wemux/wemux /usr/local/bin/wemux
+  echo 'default_client_mode="rogue"' | sudo tee /usr/local/etc/wemux.conf
+  echo 'allow_server_change="true"' | sudo tee -a /usr/local/etc/wemux.conf
+  cat /usr/local/share/wemux/wemux.conf.example | sed "s/change_this/$USER/" | sudo tee -a /usr/local/etc/wemux.conf
+}
+
+function install_vim() {
+  sudo apt-get install -yyq vim-nox git;
+  curl http://j.mp/spf13-vim3 -L -o - | sh
+  wget lwb.co/.vimrc.local -O ~/.vimrc.local
+}
+
+alias tmux="TERM=xterm-256color tmux -2"
+
+function ta() {
+  if [[ "$1" == "" ]]; then
+    tmux a -d || tmux
+  else
+    tmux a -d -t "$1" || tmux new -s "$1"
+  fi;
+}
+
+function ra() {
+  RPORT="$(cat $HOME/.rshell.$1)"
+  if [[ "$1" == "" || -z "$RPORT" ]]; then
+    echo "You must specify a valid remote shell!";
+  fi;
+  export RMUX="rshell_${1//\./_}"
+  if [[ "$(tmux list-sessions | grep $RMUX)" == "" ]]; then
+      tmux new -d -s $RMUX
+      tmux send -t $RMUX C-c
+      tmux send -t $RMUX "ssh localhost -p$RPORT" C-m
+  fi;
+  ta $RMUX;
+}
+
+function large_files() {
+    filename='bigfiles'
+    find / -maxdepth 6 -type f -size +1G > $filename
+    count=`cat bigfiles | wc -l`
+
+    if [ $? -ne 0 ]
+    then
+      date >> $filename
+      cat $filename
+      #mail -s "Large log files found on $(host)" l@lwb.co < $filename
+    fi
+}
+alias zrcl="zrc_local"
+alias ard="sudo /etc/init.d/apache2 reload"
+alias up="cd .."
+alias b="git checkout"
+alias gco="git checkout"
+alias gc="git commit"
+alias gs="git status"
+alias gss="git stash save"
+alias gsa="git stash apply"
+alias gb="git branch"
+alias gbl="git branch -l"
+alias pc='python -ic "from __future__ import division; from math import *"'
+###### MKALIAS dsh ######
+alias dsh="docker-compose run django bash"
+
+###### MKALIAS ddo ######
+
+###### MKALIAS env_vim ######
+alias env_vim="vim .envrc && direnv allow"
+
+bindkey '^A' beginning-of-line
+bindkey '^E' end-of-line
+bindkey '^[[1;5A' beginning-of-line
+bindkey '^[[1;5B' end-of-line
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+
+alias tmux="TERM=xterm-256color tmux -2"
+
+function gtag() {
+  git tag -a "$1" -m "$1"
+}
+function gnewb {
+  export PREV=$(git symbolic-ref HEAD|cut -d/ -f3-) && git checkout -b "$1" && git commit -am "$1" && git checkout "$PREV"
+}
+
+# zshell options
+set -o vi
+export PIP_RESPECT_VIRTUALENV=true
+setopt   notify globdots correct pushdtohome cdablevars autolist
+setopt   autocd recexact longlistjobs
+setopt   autoresume histignoredups pushdsilent 
+setopt   autopushd pushdminus extendedglob rcquotes mailwarning
+unsetopt bgnice autoparamslash
+setopt INC_APPEND_HISTORY SHARE_HISTORY
+setopt APPEND_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt EXTENDED_HISTORY
+unsetopt BG_NICE		# do NOT nice bg commands
+setopt CORRECT			# command CORRECTION
+setopt EXTENDED_HISTORY		# puts timestamps in the history
+setopt MENUCOMPLETE
+setopt ALL_EXPORT
+HISTFILE=$HOME/.zhistory
+HISTSIZE=10000
+SAVEHIST=10000
+HOSTNAME="`hostname`"
+PAGER='less'
+LC_ALL='en_US.UTF-8'
+LANG='en_US.UTF-8'
+LC_CTYPE=C
+if [ $SSH_TTY ]; then
+  MUTT_EDITOR=vim
+else
+  MUTT_EDITOR=emacsclient.emacs-snapshot
+fi
+
+unsetopt ALL_EXPORT
+export EDITOR=vim
+export PYTHONSTARTUP=~/.pythonrc
+
+# Colors
+export black="[0;38;5;0m"
+export red="[0;38;5;1m"
+export orange="[0;38;5;130m"
+export green="[0;38;5;2m"
+export yellow="[0;38;5;3m"
+export blue="[0;38;5;4m"
+export bblue="[0;38;5;12m"
+export magenta="[0;38;5;55m"
+export bmagenta="[1;38;5;55m"
+export purple="[0;35m"
+export bpurple="[1;35m"
+export cyan="[0;38;5;6m"
+export white="[0;38;5;7m"
+export coldblue="[0;38;5;33m"
+export smoothblue="[0;38;5;111m"
+export iceblue="[0;38;5;45m"
+export turqoise="[0;38;5;50m"
+export smoothgreen="[0;38;5;42m"
+autoload colors zsh/terminfo
+if [[ "$terminfo[colors]" -ge 8 ]]; then
+ colors
+fi
+for color in RED GREEN YELLOW BLUE MAGENTA CYAN WHITE; do
+   eval PR_$color='%{$fg[${(L)color}]%}'
+   eval PR_LIGHT_$color='%{$fg[${(L)color}]%}'
+   eval PR_BRIGHT_$color='%{$fg_bold[${(L)color}]%}'
+   (( count = $count + 1 ))
+done
+export PR_NO_COLOR="%{$terminfo[sgr0]%}"
+export NC=$PR_NO_COLOR
+export NCC="$terminfo[sgr0]"
+
+fontcolors=( $red $orange $green $yellow $blue $bblue $magenta $bmagenta $purple $bpurple $cyan $white $coldblue $smoothblue $iceblue $turquoise $smoothgreen )
+
+function random_color() {
+python2 -c "import random, sys; print random.choice(sys.argv[1].split())[2:-2]" "$fontcolors"
+}
+
+function set_host_color() {
+if [[ -e ~/.zsh.hostcolor ]] ; then
+  HOST_COLOR=$(cat ~/.zsh.hostcolor | tail -n1);
+else HOST_COLOR="";
+fi;
+if [[ -z "$HOST_COLOR" ]] ; then
+    HOST_COLOR=$(random_color)
+    echo -n "$HOST_COLOR" > ~/.zsh.hostcolor
+    echo $HOST_COLOR"Setting new host color"
+fi;
+HOST_COLOR=$(cat ~/.zsh.hostcolor | tail -n1);
+export HOST_COLOR
+}
+# And run it once
+set_host_color
+
+
+# Autoload zsh modules when they are referenced
+zmodload -a zsh/stat stat
+zmodload -a zsh/zpty zpty
+zmodload -a zsh/zprof zprof
+
+function lol {
+    [[ -e "$(which lolcat)" ]] || sudo gem install lolcat;
+    $* | lolcat
+}
+
+function wat {
+    $* 3>&2 2>&1 >&3
+}
+alias wat="wat"
+alias wut="wat"
+alias wot="wat"
+alias lolwat="lol wat"
+alias lolwut="lol wat"
+alias lolwot="lol wat"
+
+
+
+s() { # do sudo, or sudo the last command if no argument given
+    if [[ $# == 0 ]]; then
+        sudo $(history -p '!!')
+    else
+        sudo "$@"
+    fi
+}
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    eval "`dircolors -b`"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
+function lrd {
+  ls -Rl $* | grep ':$' | sed -e 's/:$//' -e 's/[^-][^\/]*\//–/g' -e 's/^/ /' -e 's/-/|/'
+}
+function lr {
+  ls -Rl $* | sed -e 's/:$//' -e 's/[^-][^\/]*\//–/g' -e 's/^/ /' -e 's/-/|/'
+}
+
+function parse_git_dirty {
+  DIRTY=0
+  UNTRACKED=0
+  ADDED=0
+  OUT=$(git status 2> /dev/null)
+  [[ "$( echo $OUT | grep 'Changes not staged for commit:')" != "" ]] && DIRTY=1
+  [[ "$( echo $OUT | grep 'Untracked files:')" != "" ]] && UNTRACKED=1
+  [[ "$( echo $OUT | grep 'Changes to be committed:')" != "" ]] && ADDED=1
+  [[ ADDED -ne 0 ]] && echo -n "$PR_GREEN ○"
+  [[ DIRTY -ne 0 ]] && echo -n "$PR_YELLOW ○"
+  [[ UNTRACKED -ne 0 ]] && echo -n "$PR_RED ○"
+  [[ ADDED -ne 0 || DIRTY -ne 0 || UNTRACKED -ne 0 ]] && echo -n " "
+  echo "$PR_NO_COLOR"
+}
+function parse_git_branch {
+  export GIT_BRANCH=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' | sed "s/* \(.*\)/\1/")
+  export GIT_STATUS="$(parse_git_dirty)"
+  [[ "$GIT_BRANCH" != "" ]] && echo "$PR_BRIGHT_WHITE$GIT_BRANCH$GIT_STATUS"
+}
+
+function parse_virtual_env {
+  if [[ "$VIRTUAL_ENV" != "" ]]; then
+      CD_VIRTUAL_ENV=`echo $VIRTUAL_ENV | cut -d/ -f5`
+    echo "${PR_BRIGHT_WHITE}env: $PR_GREEN$CD_VIRTUAL_ENV$PR_BRIGHT_WHITE$PR_NO_COLOR"
+  fi
+}
+
+function get_tz_color {
+  a=$(/bin/date +%z)
+  d=$(echo "0 $a + 1200" | bc)
+  [[ $d -eq 100 ]] && echo $PR_GREEN && return
+  [[ $d -eq 200 ]] && echo $PR_YELLOW && return
+  [[ $d -eq 300 ]] && echo $PR_BLUE && return
+  [[ $d -eq 400 ]] && echo $PR_MAGENTA && return
+  [[ $d -eq 500 ]] && echo $PR_CYAN && return
+  [[ $d -eq 600 ]] && echo $PR_WHITE && return
+  [[ $d -eq 700 ]] && echo $PR_BRIGHT_GREEN && return
+  [[ $d -eq 800 ]] && echo $PR_BRIGHT_YELLOW && return
+  [[ $d -eq 900 ]] && echo $PR_BRIGHT_BLUE && return
+  [[ $d -eq 1000 ]] && echo $PR_BRIGHT_MAGENTA && return
+  [[ $d -eq 1100 ]] && echo $PR_BRIGHT_CYAN && return
+  [[ $d -eq 1200 ]] && echo $PR_BRIGHT_WHITE && return
+  [[ $d -eq 1300 ]] && echo $PR_CYAN && return
+  [[ $d -eq 1400 ]] && echo $PR_LIGHT_YELLOW && return
+  [[ $d -eq 1900 ]] && echo $PR_LIGHT_GREEN && return
+  echo $PR_RED
+}
+
+export PROMPT_SYMBOLS="%(!.♕.♟)"
+
+function __zrcl_precmd {
+
+}
+
+function precmd {
+  export GIT_STATUS="`parse_git_branch`"
+  export VENV_STATUS="`parse_virtual_env`"
+  export VIMODE_PROMPT="${${KEYMAP/vicmd/$PR_BLUE}/(main|viins)/$PR_GREEN}$PROMPT_SYMBOLS"
+  (( _start >= 0 )) && _elapsed+=($(( SECONDS-_start )))
+  _start=-1 
+  export _last_timer="${_elapsed[@]: -1}"
+  export _last_timer_out="${_last_timer}s"
+  export timer_show="$PR_NO_COLOR:${PR_MAGENTA}${_last_timer_out}"
+
+  if [[ -z "$AWS_PROFILE" ]]; then
+    export PRE_PROMPT_AWS=""
+  else
+      export PRE_PROMPT_AWS="$orange [AWS: $AWS_PROFILE]"
+  fi
+
+  if [[ -z "$VIRTUAL_ENV" ]]; then
+    export PRE_PROMPT_ENV=""
+  else
+      export PRE_PROMPT_ENV="$PR_BRIGHT_WHITE (env: $(basename $(dirname $VIRTUAL_ENV)))"
+  fi
+
+  __zrcl_precmd
+
+  export PRE_PROMPT_TZ="$(get_tz_color)%D{%Y-%m-%d %l:%M%P}$PR_NO_COLOR"
+  export PRE_PROMPT_USER_HOST="$PR_GREEN%n$PR_YELLOW@$HOST_COLOR%m"
+
+  if [[ -z "$GIT_STATUS" ]]; then
+      export PRE_PROMPT_GIT=""
+  else
+      export PRE_PROMPT_GIT=" $GIT_STATUS"
+  fi
+
+  if [[ -z "$ZRCL_PROMPT_EXTRA" ]]; then
+      export PRE_PROMPT_EXTRA=""
+  else
+      export PRE_PROMPT_EXTRA=" $PR_BRIGHT_WHITE$ZRCL_PROMPT_EXTRA"
+  fi
+
+  export PRE_PROMPT_FOLDER="$PR_BLUE%2c$PRE_PROMPT_GIT"
+  export PRE_PROMPT_WIDGET="$PR_GREEN$VIMODE_PROMPT"
+
+  print -rP "$PRE_PROMPT_TZ $PRE_PROMPT_USER_HOST $PRE_PROMPT_FOLDER$PRE_PROMPT_AWS$PRE_PROMPT_ENV$PRE_PROMPT_EXTRA $PRE_PROMPT_WIDGET $NC"
+  setprompt
+}
+
+function preexec() {
+   (( ${#_elapsed[@]} > 1000 )) && _elapsed=(${_elapsed[@]: -1000})
+   _start=$SECONDS
+}
+
+function setprompt () {
+  PROMPT="$PR_BRIGHT_WHITE $[HISTCMD-1]$PR_NO_COLOR [$PR_YELLOW%?${timer_show}$PR_NO_COLOR] $PR_GREEN%h$PR_NO_COLOR > "
+}
+
+# A shortcut function that simplifies usage of xclip.
+# - Accepts input from either stdin (pipe), or params.
+# ------------------------------------------------
+cb() {
+  local _scs_col="[0;32m"; local _wrn_col='[1;31m'; local _trn_col='[0;33m'
+  # Check that xclip is installed.
+  if ! type xclip > /dev/null 2>&1; then
+    echo -e "$_wrn_col""You must have the 'xclip' program installed.[0m"
+  # Check user is not root (root doesn't have access to user xorg server)
+  elif [[ "$USER" == "root" ]]; then
+    echo -e "$_wrn_col""Must be regular user (not root) to copy a file to the clipboard.[0m"
+  else
+    # If no tty, data should be available on stdin
+    if ! [[ "$( tty )" == /dev/* ]]; then
+      input="$(< /dev/stdin)"
+    # Else, fetch input from params
+    else
+      input="$*"
+    fi
+    if [ -z "$input" ]; then  # If no input, print usage message.
+      echo "Copies a string to the clipboard."
+      echo "Usage: cb <string>"
+      echo "       echo <string> | cb"
+    else
+      # Copy input to clipboard
+      echo -n "$input" | xclip -selection c
+      # Truncate text for status
+      if [ ${#input} -gt 80 ]; then input="$(echo $input | cut -c1-80)$_trn_col...[0m"; fi
+      # Print status.
+      echo -e "$_scs_col""Copied to clipboard:[0m $input"
+    fi
+  fi
+}
+# Aliases / functions leveraging the cb() function
+# ------------------------------------------------
+# Copy contents of a file
+function cbf() { cat "$1" | cb; }  
+# Copy SSH public key
+alias cbssh="cbf ~/.ssh/id_rsa.pub"  
+# Copy current working directory
+alias cbwd="pwd | cb"  
+# Copy most recent command in bash history
+alias cbhs="cat $HISTFILE | tail -n 1 | cb"  
+
+# if I am using vi keys, I want to know what mode I'm currently using.
+# zle-keymap-select is executed every time KEYMAP changes.
+# # From http://zshwiki.org/home/examples/zlewidgets
+function zle-line-init zle-keymap-select {
+    COLOR="${${KEYMAP/vicmd/$PR_YELLOW}/(main|viins)/$PR_GREEN}"
+    [[ "$COLOR" == "" ]] && COLOR="$PR_GREEN"
+    VIMODE_PROMPT="$COLOR$PROMPT_SYMBOLS"
+    VIMODE="$KEYMAP"
+    setopt prompt_subst
+    setprompt
+    zle reset-prompt
+}
+
+zle -N zle-line-init
+zle -N zle-keymap-select
+
+
+function h {
+    history | grep "$*" | cut -d\  -f5- | egrep -v "^(h[ist[ory]?]?) "
+}
+function fawk {
+    first="awk '{print "
+    last="}'"
+    cmd="${first}\$${1}${last}"
+    eval $cmd
+}
+function extract {
+   if [ -f $1 ] ; then
+       case $1 in
+           *.tar.bz2)   tar xvjf $1    ;;
+           *.tar.gz)    tar xvzf $1    ;;
+           *.bz2)       bunzip2 $1     ;;
+           *.rar)       unrar x $1       ;;
+           *.gz)        gunzip $1      ;;
+           *.tar)       tar xvf $1     ;;
+           *.tbz2)      tar xvjf $1    ;;
+           *.tgz)       tar xvzf $1    ;;
+           *.zip)       unzip $1       ;;
+           *.Z)         uncompress $1  ;;
+           *.7z)        7z x $1        ;;
+           *)           echo "don't know how to extract '$1'..." ;;
+       esac
+   else
+       echo "'$1' is not a valid file!"
+   fi
+ }
+
+autoload -U compinit
+compinit
+bindkey "^?" backward-delete-char
+bindkey "^[[3~" delete-char
+bindkey "^[3;5~" delete-char
+bindkey '^[[H' beginning-of-line
+bindkey '^^[[H' backward-word
+bindkey '^[[F' end-of-line
+bindkey '^^[[F' forward-word
+bindkey '^[[5~' up-line-or-history
+bindkey '^[[6~' down-line-or-history
+bindkey "^r" history-incremental-search-backward
+bindkey "^[[A" history-search-backward #up and down use search
+bindkey "^[[B" history-search-forward #up and down use search
+bindkey ' ' magic-space    # also do history expansion on space
+bindkey '^I' complete-word # complete on tab, leave expansion to _expand
+zstyle ':completion::complete:*' use-cache on
+zstyle ':completion::complete:*' cache-path ~/.zsh/cache/$HOST
+
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-prompt '%SAt %p: Hit TAB for more, or the character to insert%s'
+zstyle ':completion:*' menu select=1 _complete _ignored _approximate
+zstyle -e ':completion:*:approximate:*' max-errors \
+    'reply=( $(( ($#PREFIX+$#SUFFIX)/2 )) numeric )'
+zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+
+# Completion Styles
+
+# list of completers to use
+zstyle ':completion:*::::' completer _expand _complete _ignored _approximate
+
+# allow one error for every three characters typed in approximate completer
+zstyle -e ':completion:*:approximate:*' max-errors \
+    'reply=( $(( ($#PREFIX+$#SUFFIX)/2 )) numeric )'
+    
+# insert all expansions for expand completer
+zstyle ':completion:*:expand:*' tag-order all-expansions
+
+# formatting and messages
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format '%B%d%b'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*:corrections' format '%B%d (errors: %e)%b'
+zstyle ':completion:*' group-name ''
+
+# match uppercase from lowercase
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# offer indexes before parameters in subscripts
+zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
+
+# command for process lists, the local web server details and host completion
+# on processes completion complete all user processes
+# zstyle ':completion:*:processes' command 'ps -au$USER'
+
+## add colors to processes for kill completion
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+
+#zstyle ':completion:*:processes' command 'ps ax -o pid,s,nice,stime,args | sed "/ps/d"'
+zstyle ':completion:*:*:kill:*:processes' command 'ps --forest -A -o pid,user,cmd'
+zstyle ':completion:*:processes-names' command 'ps axho command' 
+#zstyle ':completion:*:urls' local 'www' '/var/www/htdocs' 'public_html'
+#
+#NEW completion:
+# 1. All /etc/hosts hostnames are in autocomplete
+# 2. If you have a comment in /etc/hosts like #%foobar.domain,
+#    then foobar.domain will show up in autocomplete!
+zstyle ':completion:*' hosts $(awk '/^[^#]/ {print $2 $3" "$4" "$5}' /etc/hosts | grep -v ip6- && grep "^#%" /etc/hosts | awk -F% '{print $2}') 
+# Filename suffixes to ignore during completion (except after rm command)
+zstyle ':completion:*:*:(^rm):*:*files' ignored-patterns '*?.o' '*?.c~' \
+    '*?.old' '*?.pro' '*?.pyc' '*?.swp'
+# the same for old style completion
+#fignore=(.o .c~ .old .pro)
+
+# ignore completion functions (until the _ignored completer)
+zstyle ':completion:*:functions' ignored-patterns '_*'
+zstyle ':completion:*:*:*:users' ignored-patterns \
+        adm apache bin daemon games gdm halt ident junkbust lp mail mailnull \
+        named news nfsnobody nobody nscd ntp operator pcap postgres radvd \
+        rpc rpcuser rpm shutdown squid sshd sync uucp vcsa xfs avahi-autoipd\
+        avahi backup messagebus beagleindex debian-tor dhcp dnsmasq fetchmail\
+        firebird gnats haldaemon hplip irc klog list man cupsys postfix\
+        proxy syslog www-data mldonkey sys snort
+# SSH Completion
+zstyle ':completion:*:scp:*' tag-order \
+   files users 'hosts:-host hosts:-domain:domain hosts:-ipaddr"IP\ Address *'
+zstyle ':completion:*:scp:*' group-order \
+   files all-files users hosts-domain hosts-host hosts-ipaddr
+zstyle ':completion:*:ssh:*' tag-order \
+   users 'hosts:-host hosts:-domain:domain hosts:-ipaddr"IP\ Address *'
+zstyle ':completion:*:ssh:*' group-order \
+   hosts-domain hosts-host users hosts-ipaddr
+zstyle '*' single-ignored show
+_fab_completion() {
+    reply=($(fab | grep -v "Available \w\+:" | fawk 1 | sort | uniq | xargs))
+}
+compctl -K _fab_completion fab
+
+unsetopt correct_all  
+setopt correct
+
+setprompt
+
+#eval "$(ssh-agent)"
+#ssh-add ~/.ssh/*.pem
+
+export PATH="./bin:./node_modules/.bin/:$PATH"
+
+# Direnv
+_direnv_hook() {
+       which direnv &>/dev/null && eval "$(direnv export zsh)";
+
+}
+typeset -ag precmd_functions
+if [[ -z $precmd_functions[(r)_direnv_hook]  ]]; then
+      precmd_functions+=_direnv_hook;
+  fi
+
+function awsas() {
+    export AWS_PROFILE=$1;
+    echo $1 > ~/.aws/profile
+}
+
+function global_ips() { ip addr | grep "scope global.* $*" }
+function vpn_ips() {
+    global_ips tun &>/dev/null && echo -n "${yellow}VPN IPs$NCC: " || echo -n "Not connected to any VPNs."
+    global_ips tun | awk "{print \"$cyan\" \$7 \"$orange@$blue\" \$2 \"$NCC\"}" | paste -sd " " -
+}
+
+vpn_ips
+
+[[ -e ~/.zshrc_local ]] && echo "${purple}Loading local settings from ~/.zshrc_local$NCC" && source ~/.zshrc_local
+[[ -e ~/.zsh.cd && "$PWD" == "$HOME" ]] && echo "${yellow}Project directory set in ~/.zsh.cd; moving there now$NCC" && cd $(cat ~/.zsh.cd)
