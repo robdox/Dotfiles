@@ -1,0 +1,29 @@
+if &compatible
+  set nocompatible
+end
+
+" Remove declared plugins
+function! s:UnPlug(plug_name)
+  if has_key(g:plugs, a:plug_name)
+    call remove(g:plugs, a:plug_name)
+  endif
+endfunction
+command!  -nargs=1 UnPlug call s:UnPlug(<args>)
+
+let g:has_async = v:version >= 800 || has('nvim')
+
+call plug#begin('~/.vim/bundle')
+
+" Define bundles via Github repos
+Plug 'mbbill/undotree'
+Plug 'scrooloose/nerdtree'
+Plug 'tpope/vim-surround'
+Plug 'vim-syntastic/syntastic'
+Plug 'spf13/vim-autoclose'
+Plug 'tpope/vim-fugitive'
+
+if g:has_async
+  Plug 'w0rp/ale'
+endif
+
+call plug#end()
