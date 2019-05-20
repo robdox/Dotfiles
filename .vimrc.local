@@ -1,6 +1,12 @@
 set background=dark
-set undodir=~/.vim/undodir
+
 set nowrap
+
+set undofile " Maintain undo history between sessions
+set undodir=~/.vim/undodir
+
+set backup " Maintain backups of files we edit
+set backupdir=~/.vim/backupdir
 
 
 " UndoTree {
@@ -8,10 +14,6 @@ set nowrap
         nnoremap <Leader>u :UndotreeToggle<CR>
         " If undotree is opened, it is likely one wants to interact with it.
         let g:undotree_SetFocusWhenToggle=1
-    endif
-    if has("persistent_undo")
-      set undodir=$HOME."/.undodir"
-      set undofile
     endif
 " }
 

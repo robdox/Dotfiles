@@ -1,0 +1,9 @@
+# No arguments: `Doesnt work `
+# With arguments: acts like `grep but removes django stuff thats annoying`
+dgrep() {
+  if [[ $# -gt 0 ]]; then
+    grep -inR --exclude-dir='migrations' --exclude-dir='test' --exclude-dir='node_modules' --exclude='*tests*' "$@"
+  else
+    echo 'You need arguments dude come on'
+  fi
+}

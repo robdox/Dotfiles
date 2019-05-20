@@ -4,7 +4,6 @@ set encoding=utf-8
 let mapleader = ','
 let maplocalleader = '_'
 
-set backup
 set backspace=2   " Backspace deletes like most programs in insert mode
 set noswapfile    " http://robots.thoughtbot.com/post/18739402579/global-gitignore#comment-458413287
 set history=50
