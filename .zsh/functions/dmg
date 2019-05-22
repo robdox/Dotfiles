@@ -1,0 +1,17 @@
+# No -c arguments: Will use the default container "debug" here
+# With -c argument: Will attempt to use the container name provided
+# With arguments: runs `python manage.py <arguments>` inside docker container
+dmg() {
+    CONTAINER="debug"
+    while getopts "c:" OPTIONS
+    do
+        case "${OPTIONS}" in
+            c) CONTAINER="${OPTARG}" ;;
+        esac
+    done
+    if [ $OPTIND -ne 1 ];
+    then
+        shift "$((OPTIND-1))"
+    fi
+    docker exec -it $CONTAINER python manage.py "$@"
+}
