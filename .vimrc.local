@@ -1,12 +1,17 @@
+" Obviously
 set background=dark
-
-set nowrap
 
 set undofile " Maintain undo history between sessions
 set undodir=~/.vim/undodir
 
 set backup " Maintain backups of files we edit
 set backupdir=~/.vim/backupdir
+
+" I don't like the behavior of moving up and down lines with wrapping 
+set nowrap
+
+" Highlighting search terms
+set hlsearch
 
 
 " UndoTree {
