@@ -1,0 +1,9 @@
+# No arguments: kills all containers in the compose and brings em back up
+# With arguments: does it but for that one container
+dcleanup() {
+  if [[ $# -gt 0 ]]; then
+    docker-compose kill "$@" && docker-compose rm -f "$@" && docker-compose up -d "$@" && docker-compose logs -f "$@"
+  else
+    docker-compose kill && docker-compose rm -f && docker-compose up -d && docker-compose logs -f 
+  fi
+}
