@@ -1,3 +1,6 @@
 */bundle/*
+!bundle/.gitkeep
 */backupdir/*
+!backupdir/.gitkeep
 */undodir/*
+!undodir/.gitkeep
