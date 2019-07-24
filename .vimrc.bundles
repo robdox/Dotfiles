@@ -21,6 +21,7 @@ Plug 'tpope/vim-surround'
 Plug 'vim-syntastic/syntastic'
 Plug 'spf13/vim-autoclose'
 Plug 'tpope/vim-fugitive'
+Plug 'hashivim/vim-terraform'
 
 if g:has_async
   Plug 'w0rp/ale'
