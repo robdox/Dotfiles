@@ -10,8 +10,6 @@ function! s:UnPlug(plug_name)
 endfunction
 command!  -nargs=1 UnPlug call s:UnPlug(<args>)
 
-let g:has_async = v:version >= 800 || has('nvim')
-
 call plug#begin('~/.vim/bundle')
 
 " Define bundles via Github repos
@@ -22,9 +20,8 @@ Plug 'vim-syntastic/syntastic'
 Plug 'spf13/vim-autoclose'
 Plug 'tpope/vim-fugitive'
 Plug 'hashivim/vim-terraform'
-
-if g:has_async
-  Plug 'w0rp/ale'
-endif
+Plug 'Vimjas/vim-python-pep8-indent'
+Plug 'pangloss/vim-javascript'
+Plug 'maxmellon/vim-jsx-pretty'
 
 call plug#end()

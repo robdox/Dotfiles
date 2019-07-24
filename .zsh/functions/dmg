@@ -2,7 +2,7 @@
 # With -c argument: Will attempt to use the container name provided
 # With arguments: runs `python manage.py <arguments>` inside docker container
 dmg() {
-    CONTAINER="debug"
+    CONTAINER="vulcan"
     while getopts "c:" OPTIONS
     do
         case "${OPTIONS}" in
