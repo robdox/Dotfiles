@@ -13,6 +13,10 @@ set nowrap
 " Highlighting search terms
 set hlsearch
 
+" Fix syntax highlighting for python3 stuff
+let g:syntastic_python_python_exec = 'python3'
+let g:syntastic_python_checkers = ['python']
+
 
 " UndoTree {
     if isdirectory(expand("~/.vim/bundle/undotree/"))
