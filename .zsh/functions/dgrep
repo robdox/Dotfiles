@@ -2,7 +2,7 @@
 # With arguments: acts like `grep` but removes django stuff thats annoying
 dgrep() {
   if [[ $# -gt 0 ]]; then
-    grep -inR --exclude-dir='static' --exclude-dir='migrations' --exclude='.coverage' --exclude-dir='.tox' --exclude-dir='test' --exclude-dir='media' --exclude-dir='node_modules' --exclude='*tests*' "$@"
+    grep -inR --exclude-dir='css' --exclude-dir='static' --exclude-dir='migrations' --exclude='.coverage' --exclude-dir='.tox' --exclude-dir='test' --exclude-dir='media' --exclude-dir='node_modules' --exclude='*tests*' "$@"
   else
     echo 'You need arguments dude come on'
   fi

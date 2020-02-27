@@ -1,0 +1,4 @@
+# lints the react container
+drlint() {
+    docker exec -it react eslint 'src/**' --quiet
+}
