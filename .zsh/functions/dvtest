@@ -1,4 +1,0 @@
-# tests the vulcan django code
-dvtest() {
-    docker exec -it vulcan tox -e pytest
-}

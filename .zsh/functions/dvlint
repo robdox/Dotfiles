@@ -1,4 +1,0 @@
-# lints the vulcan container
-dvlint() {
-    docker exec -it vulcan tox -e flake8
-}
