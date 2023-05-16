@@ -4,3 +4,6 @@
 !backupdir/.gitkeep
 */undodir/*
 !undodir/.gitkeep
+
+.zshrc.local
+.vimrc.local

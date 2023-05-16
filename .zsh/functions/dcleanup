@@ -2,8 +2,8 @@
 # With arguments: does it but for that one container
 dcleanup() {
   if [[ $# -gt 0 ]]; then
-    docker-compose kill "$@" && docker-compose rm -f "$@" && docker-compose up -d "$@" && docker-compose logs -f "$@"
+    docker compose kill "$@" && docker compose rm -f "$@" && docker compose up -d "$@" && docker compose logs -f "$@"
   else
-    docker-compose kill && docker-compose rm -f && docker-compose up -d && docker-compose logs -f 
+    docker compose kill && docker compose rm -f && docker compose up -d && docker compose logs -f
   fi
 }

@@ -1,8 +1,8 @@
 dcuweb() {
-  docker-compose run --rm circus-idl &&
-  docker-compose up -d thrift &&
-  docker-compose up -d grpc &&
-  docker-compose up -d node &&
-  docker-compose up -d python &&
-  docker-compose logs -f
+  docker compose run --rm circus-idl &&
+  docker compose up -d thrift &&
+  docker compose up -d grpc &&
+  docker compose up -d node &&
+  docker compose up -d python &&
+  docker compose logs -f
 }

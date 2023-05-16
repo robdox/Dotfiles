@@ -1,9 +1,9 @@
-# No arguments: `docker-compose ps`
-# With arguments: acts like `docker-compose`
+# No arguments: `docker compose ps`
+# With arguments: acts like `docker compose`
 function dc() {
   if [[ $# -gt 0 ]]; then
-    docker-compose "$@"
+    docker compose "$@"
   else
-    docker-compose ps
+    docker compose ps
   fi
 }
