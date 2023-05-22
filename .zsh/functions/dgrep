@@ -2,7 +2,7 @@
 # With arguments: acts like `grep` but removes django stuff thats annoying
 dgrep() {
   if [[ $# -gt 0 ]]; then
-    grep -inR --exclude=\*.pyc --exclude-dir='*.pytest_cache' --exclude-dir='migrations' --exclude-dir='css' --exclude-dir='static' --exclude-dir='node_modules' --exclude='*tests*' "$@"
+    grep -inR --exclude=\*.pyc --exclude-dir='.mypy_cache' --exclude-dir='*.pytest_cache' --exclude-dir='migrations' --exclude-dir='css' --exclude-dir='static' --exclude-dir='node_modules' --exclude='*tests*' "$@"
   else
     echo 'You need arguments dude come on'
   fi
