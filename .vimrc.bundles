@@ -26,5 +26,6 @@ Plug 'maxmellon/vim-jsx-pretty'
 Plug 'leafgarland/typescript-vim'
 Plug 'peitalin/vim-jsx-typescript'
 Plug 'tfnico/vim-gradle'
+Plug 'editorconfig/editorconfig-vim'
 
 call plug#end()
