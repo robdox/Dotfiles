@@ -1,9 +1,22 @@
-# No arguments: `Doesnt work `
-# With arguments: acts like `grep` but removes django stuff thats annoying
+# `dgrep <pattern> [paths…]` — grep with the usual monorepo noise excluded.
+# Prefers ripgrep if installed (which already respects .gitignore).
 dgrep() {
-  if [[ $# -gt 0 ]]; then
-    grep -inR --exclude=\*.pyc --exclude-dir='.mypy_cache' --exclude-dir='*.pytest_cache' --exclude-dir='migrations' --exclude-dir='css' --exclude-dir='static' --exclude-dir='node_modules' --exclude='*tests*' "$@"
+  if (( $# == 0 )); then
+    echo "usage: dgrep <pattern> [paths…]" >&2
+    return 2
+  fi
+  if command -v rg >/dev/null 2>&1; then
+    rg --hidden --glob '!.git' "$@"
   else
-    echo 'You need arguments dude come on'
+    grep -inR \
+      --exclude-dir=node_modules \
+      --exclude-dir=.git \
+      --exclude-dir=.turbo \
+      --exclude-dir=dist \
+      --exclude-dir=build \
+      --exclude-dir=.next \
+      --exclude-dir=coverage \
+      --exclude='*.map' \
+      "$@"
   fi
 }

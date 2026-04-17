@@ -1,4 +1,15 @@
-# With arguments: runs `<arguments>` inside docker container
+# `dec <service> [cmd…]` — exec into a docker compose service interactively.
+# Default command is a shell (bash, fall back to sh).
 dec() {
-    docker exec -it server "$@"
+  if (( $# < 1 )); then
+    echo "usage: dec <service> [cmd…]" >&2
+    return 2
+  fi
+  local service="$1"; shift
+  if (( $# == 0 )); then
+    docker compose exec -it "$service" bash 2>/dev/null || \
+    docker compose exec -it "$service" sh
+  else
+    docker compose exec -it "$service" "$@"
+  fi
 }
