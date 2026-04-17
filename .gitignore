@@ -7,3 +7,6 @@
 
 .zshrc.local
 .vimrc.local
+
+# zsh compiled caches
+*.zwc

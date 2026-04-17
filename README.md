@@ -1,15 +1,44 @@
 # Dotfiles
 
-Delete your old .vimrc (and bundles and local and whatever) 
+Personal dotfiles — zsh, vim, and friends.
 
-Delete your old .zshrc and .zsh folder (and whatever else)
+## Install
 
-Symlink these files to your root.
+```sh
+cd ~/p && git clone --recursive https://github.com/robdox/Dotfiles.git
+cd Dotfiles
 
-Open up the `.vimrc.bundles` and do `:PlugInstall` to install them
+# symlink into $HOME
+for f in .zshrc .zshrc.local .antigenrc .vimrc .vimrc.bundles .vimrc.local; do
+  ln -sf "$PWD/$f" "$HOME/$f"
+done
+ln -sf "$PWD/.zsh" "$HOME/.zsh"
+ln -sf "$PWD/.vim" "$HOME/.vim"
 
-# Antigen
+# Open a new shell — antigen will fetch plugins on first run.
+```
 
-If you're missing `antigen.zsh` use the following command to get it : `curl -L git.io/antigen > antigen.zsh`. 
+If `antigen.zsh` is missing inside `antigen/`, you skipped `--recursive`.
+Run `git submodule update --init` from the repo root.
 
-More instructions [here](https://github.com/zsh-users/antigen/wiki/Installation)
+## iTerm2: new tabs/splits in the current directory
+
+Out of the box iTerm2 opens every new tab/split at `$HOME`. To inherit the
+current shell's working directory:
+
+- **iTerm2 → Settings → Profiles → General → Working Directory**
+- Choose **"Reuse previous session's directory"** (apply to your default profile).
+
+This makes `⌘T`, `⌘D`, and `⌘⇧D` all start in the CWD of the current pane.
+
+## Vim
+
+Open `.vimrc.bundles` and run `:PlugInstall` to install plugins.
+
+## Layout
+
+- `.zshrc` / `.zshrc.local` — shell entry + machine-local overrides
+- `.antigenrc` — antigen plugin bundle
+- `.zsh/config/*` — modular zsh config, loaded by `.zshrc`
+- `.zsh/functions/*` — autoloaded helper functions
+- `.vimrc` / `.vim/` — vim configuration
