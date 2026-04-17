@@ -57,10 +57,34 @@ If you don't install these, the shell still works — every integration in
 
 This makes `⌘T`, `⌘D`, and `⌘⇧D` start in the CWD of the current pane.
 
-## Vim
+## Neovim
 
-Open `.vimrc.bundles` and run `:PlugInstall`. A Neovim (kickstart.nvim)
-setup is planned as a follow-up PR.
+Full LSP/Treesitter/Telescope setup lives in `nvim/`. `bootstrap.sh`
+symlinks it to `~/.config/nvim`. First launch auto-installs `lazy.nvim`,
+all plugins, and (via Mason) the language servers + formatters.
+
+Leader is `<Space>`. Highlights:
+
+- `<leader>sf` find file, `<leader>sg` live-grep, `<leader>ss` document symbols
+- `gd` jump to definition, `gr` references, `K` hover doc, `<leader>rn` rename
+- `<leader>ca` code action, `<leader>cd` line diagnostic
+- `]c` / `[c` next / previous git hunk, `<leader>hs` stage, `<leader>hp` preview
+- `-` opens the current directory as an editable buffer (oil.nvim)
+- `<leader>tt` run file tests (vim-test), `<leader>tn` nearest
+- `:FormatToggle` pauses format-on-save when you need to commit a WIP
+
+Mason downloads the following on first run:
+
+- LSP: `typescript-tools` (tsserver), `eslint`, `prismals`, `yamlls`,
+  `jsonls`, `lua_ls`, `bashls`, `tailwindcss`, `cssls`, `html`,
+  `marksman`, `pyright`, `gopls`
+- Formatters/linters: `prettierd`, `eslint_d`, `stylua`, `shfmt`,
+  `goimports`
+
+## Vim (legacy)
+
+`~/.vimrc` still works as a fallback. `alias v` prefers Neovim when
+installed and falls back to vim on systems without it.
 
 ## Updating
 
