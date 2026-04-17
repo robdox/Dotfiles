@@ -25,8 +25,12 @@ error_symbol = "[❯](bold red)"
 vimcmd_symbol = "[❮](bold blue)"
 
 [directory]
+# Show up to 4 parent segments. `truncate_to_repo = false` means we
+# don't collapse to just the repo name — so in ~/p/Dotfiles the prompt
+# shows "~/p/Dotfiles", not "Dotfiles".
 truncation_length = 4
-truncate_to_repo = true
+truncate_to_repo = false
+truncation_symbol = "…/"
 style = "bold cyan"
 
 [git_branch]
