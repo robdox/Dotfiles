@@ -1,44 +1,71 @@
 # Dotfiles
 
-Personal dotfiles — zsh, vim, and friends.
+My personal dotfiles — zsh, vim, starship, Brewfile.
 
 ## Install
 
 ```sh
-cd ~/p && git clone --recursive https://github.com/robdox/Dotfiles.git
-cd Dotfiles
+# clone
+git clone https://github.com/robdox/Dotfiles.git ~/p/Dotfiles
+cd ~/p/Dotfiles
 
-# symlink into $HOME
-for f in .zshrc .zshrc.local .antigenrc .vimrc .vimrc.bundles .vimrc.local; do
-  ln -sf "$PWD/$f" "$HOME/$f"
-done
-ln -sf "$PWD/.zsh" "$HOME/.zsh"
-ln -sf "$PWD/.vim" "$HOME/.vim"
+# symlink into $HOME and install the modern toolchain via Homebrew
+./bootstrap.sh --with-brew
 
-# Open a new shell — antigen will fetch plugins on first run.
+# open a new terminal — zinit auto-installs on first run
 ```
 
-If `antigen.zsh` is missing inside `antigen/`, you skipped `--recursive`.
-Run `git submodule update --init` from the repo root.
+`bootstrap.sh` without `--with-brew` only symlinks files. You can run
+`brew bundle --file=~/p/Dotfiles/Brewfile` later.
+
+## What's inside
+
+```
+.zshrc                         entry point; sources modules below
+.zsh/config/00-env.zsh         history / locale / EDITOR / shell options
+.zsh/config/10-path.zsh        PATH composition
+.zsh/config/20-plugins.zsh     zinit + autosuggestions / syntax-highlighting / history-substring-search
+.zsh/config/30-completion.zsh  compinit + completion styles
+.zsh/config/40-keybindings.zsh vi-mode + emacs shortcuts + substring search
+.zsh/config/50-prompt.zsh      Starship if installed, fallback PS1 otherwise
+.zsh/config/60-tools.zsh       conditional init for mise / fzf / zoxide / atuin / direnv / SDKMAN
+.zsh/config/70-unify.zsh       Unify workflow aliases (added in PR 3)
+.zsh/functions/*               docker / compose helpers
+starship.toml                  two-line prompt config → ~/.config/starship.toml
+Brewfile                       full toolchain
+bootstrap.sh                   symlink installer
+```
+
+## Tooling chosen (and why)
+
+| Replaces                | With                    | Why                                               |
+| ----------------------- | ----------------------- | ------------------------------------------------- |
+| antigen                 | **zinit**               | faster, actively maintained                       |
+| zeta-zsh-theme          | **starship**            | single binary, no shim bugs, language-aware       |
+| nvm                     | **mise**                | unified: node + python + go + terraform + …       |
+| `history \| grep`       | **atuin**               | searchable, syncable shell history                |
+| `cd`                    | **zoxide (`z`)**        | jumps to frecent directories                      |
+| grep / find / cat / ls  | **rg / fd / bat / eza** | modern, faster, better defaults                   |
+
+If you don't install these, the shell still works — every integration in
+`60-tools.zsh` is guarded by `command -v`.
 
 ## iTerm2: new tabs/splits in the current directory
 
-Out of the box iTerm2 opens every new tab/split at `$HOME`. To inherit the
-current shell's working directory:
-
 - **iTerm2 → Settings → Profiles → General → Working Directory**
-- Choose **"Reuse previous session's directory"** (apply to your default profile).
+- Set to **"Reuse previous session's directory"**.
 
-This makes `⌘T`, `⌘D`, and `⌘⇧D` all start in the CWD of the current pane.
+This makes `⌘T`, `⌘D`, and `⌘⇧D` start in the CWD of the current pane.
 
 ## Vim
 
-Open `.vimrc.bundles` and run `:PlugInstall` to install plugins.
+Open `.vimrc.bundles` and run `:PlugInstall`. A Neovim (kickstart.nvim)
+setup is planned as a follow-up PR.
 
-## Layout
+## Updating
 
-- `.zshrc` / `.zshrc.local` — shell entry + machine-local overrides
-- `.antigenrc` — antigen plugin bundle
-- `.zsh/config/*` — modular zsh config, loaded by `.zshrc`
-- `.zsh/functions/*` — autoloaded helper functions
-- `.vimrc` / `.vim/` — vim configuration
+```sh
+cd ~/p/Dotfiles && git pull
+zinit update --all   # if plugins drift
+brew bundle          # refresh toolchain
+```
