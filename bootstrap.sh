@@ -49,6 +49,9 @@ say "Linking Starship config…"
 mkdir -p "$HOME/.config"
 link "$DOTFILES/starship.toml" "$HOME/.config/starship.toml"
 
+say "Linking Neovim config…"
+link "$DOTFILES/nvim" "$HOME/.config/nvim"
+
 if [[ "${1:-}" == "--with-brew" ]]; then
   if ! command -v brew >/dev/null 2>&1; then
     warn "Homebrew not installed. Install from https://brew.sh and re-run."

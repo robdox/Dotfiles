@@ -49,6 +49,17 @@ if command -v fd >/dev/null 2>&1; then
   alias f='fd'
 fi
 
+# Neovim if present, otherwise fall through to vim for `v`.
+if command -v nvim >/dev/null 2>&1; then
+  alias v='nvim'
+  alias vi='nvim'
+  alias vimdiff='nvim -d'
+  export EDITOR='nvim'
+  export VISUAL='nvim'
+else
+  alias v='vim'
+fi
+
 # ── Navigation ───────────────────────────────────────────────────────────────
 alias ..='cd ..'
 alias ...='cd ../..'
