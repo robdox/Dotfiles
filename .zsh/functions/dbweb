@@ -1,3 +1,0 @@
-dbweb() {
-  docker compose pull && docker compose build && docker compose run --rm circus-idl
-}
