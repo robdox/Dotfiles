@@ -1,7 +1,8 @@
 # Brewfile — run `brew bundle --file=./Brewfile` from this repo.
 # Optional: `brew bundle cleanup --file=./Brewfile --force` removes anything not listed.
-
-tap "homebrew/bundle"
+#
+# Note: `brew bundle` is now built into Homebrew — the old `homebrew/bundle`
+# tap was deprecated and removed, so no `tap` line is needed here.
 
 # ── Core shell tooling ──────────────────────────────────────────────────────
 brew "zsh"
