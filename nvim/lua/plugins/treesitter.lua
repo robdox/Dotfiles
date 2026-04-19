@@ -3,9 +3,10 @@
 return {
   {
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master',
     build = ':TSUpdate',
     event = { 'BufReadPost', 'BufNewFile' },
-    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
+    dependencies = { { 'nvim-treesitter/nvim-treesitter-textobjects', branch = 'master' } },
     config = function()
       require('nvim-treesitter.configs').setup({
         ensure_installed = {

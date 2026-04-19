@@ -69,7 +69,7 @@ return {
       local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
       -- ── Servers ──────────────────────────────────────────────────────────
-      -- typescript-tools handles tsserver; everything else via lspconfig.
+      -- typescript-tools handles tsserver; everything else via vim.lsp.config.
       local servers = {
         eslint            = {},
         prismals          = {},
@@ -100,6 +100,14 @@ return {
         gopls             = {},
       }
 
+      -- Register per-server overrides with the new vim.lsp.config API.
+      -- mason-lspconfig v2 calls vim.lsp.enable() for each installed server,
+      -- which merges these overrides with the base config shipped by lspconfig.
+      for server, opts in pairs(servers) do
+        opts.capabilities = vim.tbl_deep_extend('force', {}, capabilities, opts.capabilities or {})
+        vim.lsp.config(server, opts)
+      end
+
       local ensure_installed = vim.tbl_keys(servers)
       vim.list_extend(ensure_installed, {
         'stylua',          -- lua formatter
@@ -111,13 +119,8 @@ return {
       require('mason-tool-installer').setup({ ensure_installed = ensure_installed })
 
       require('mason-lspconfig').setup({
-        handlers = {
-          function(server)
-            local opts = servers[server] or {}
-            opts.capabilities = vim.tbl_deep_extend('force', {}, capabilities, opts.capabilities or {})
-            require('lspconfig')[server].setup(opts)
-          end,
-        },
+        ensure_installed = vim.tbl_keys(servers),
+        automatic_enable = true,
       })
     end,
   },
