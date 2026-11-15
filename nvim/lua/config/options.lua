@@ -45,6 +45,7 @@ o.swapfile = false
 o.backup = false
 o.confirm = true
 o.mouse = 'a'
+o.mousemodel = 'popup'  -- right-click menu keeps the current selection (default popup_setpos drops it)
 o.clipboard = 'unnamedplus'  -- share with macOS clipboard
 
 -- Completion menu
