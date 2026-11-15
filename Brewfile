@@ -21,7 +21,7 @@ brew "fd"              # find
 brew "git-delta"       # git pager
 brew "jq"              # JSON
 brew "yq"              # YAML
-brew "tldr"            # man-page tl;dr
+brew "tlrc"            # tldr client (the `tldr` formula was removed from core)
 
 # ── Git / GitHub / editors ──────────────────────────────────────────────────
 brew "git"

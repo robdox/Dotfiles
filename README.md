@@ -32,6 +32,8 @@ cd ~/p/Dotfiles
 .zsh/config/70-unify.zsh       Unify workflow aliases (added in PR 3)
 .zsh/functions/*               docker / compose helpers
 starship.toml                  two-line prompt config → ~/.config/starship.toml
+.gitconfig                     git defaults + delta; identity in untracked ~/.gitconfig.local
+.gitignore_global              global git excludes
 Brewfile                       full toolchain
 bootstrap.sh                   symlink installer
 ```

@@ -32,13 +32,24 @@ link() {
 }
 
 say "Linking top-level dotfiles…"
-for f in .zshrc .antigenrc .vimrc .vimrc.bundles .vimrc.local; do
+for f in .zshrc .vimrc .vimrc.bundles .vimrc.local .gitconfig .gitignore_global; do
   [[ -f $DOTFILES/$f ]] && link "$DOTFILES/$f" "$HOME/$f"
 done
 # .zshrc.local is machine-specific — create empty if missing, but don't overwrite.
 if [[ ! -e $HOME/.zshrc.local ]]; then
   touch "$HOME/.zshrc.local"
   ok "created empty ~/.zshrc.local"
+fi
+# .gitconfig.local holds identity — stub it so git nags you instead of
+# silently committing as the wrong person.
+if [[ ! -e $HOME/.gitconfig.local ]]; then
+  cat > "$HOME/.gitconfig.local" <<'EOF'
+# Machine-local git identity (not committed). Included from ~/.gitconfig.
+[user]
+	# name = Your Name
+	# email = you@example.com
+EOF
+  warn "created ~/.gitconfig.local — fill in [user] name/email"
 fi
 
 say "Linking .zsh/ and .vim/ directories…"
@@ -67,4 +78,4 @@ echo "Next steps:"
 echo "  • Run \`brew bundle --file=$DOTFILES/Brewfile\` to install the modern toolchain."
 echo "  • iTerm2 → Settings → Profiles → General → Working Directory"
 echo "    → set to \"Reuse previous session's directory\"."
-echo "  • (optional) run \`mise use -g node@lts python@3 go@latest\` to seed runtimes."
+echo "  • Run \`mise use -g node@lts python@3 go@latest\` to seed runtimes (Mason's LSPs need node + go)."

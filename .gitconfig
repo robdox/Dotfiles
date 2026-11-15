@@ -1,0 +1,68 @@
+# ~/.gitconfig — symlinked by bootstrap.sh.
+#
+# Identity (name/email/signing key) lives in ~/.gitconfig.local, which is
+# machine-specific and not committed. bootstrap.sh creates a stub.
+
+[include]
+	path = ~/.gitconfig.local
+
+[init]
+	defaultBranch = main
+
+[core]
+	editor = nvim
+	excludesfile = ~/.gitignore_global
+	autocrlf = input
+
+[pull]
+	ff = only
+
+[push]
+	default = current
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+
+[rebase]
+	autoStash = true
+	autoSquash = true
+
+[merge]
+	conflictstyle = zdiff3
+
+[diff]
+	algorithm = histogram
+	colorMoved = default
+
+[rerere]
+	enabled = true
+
+[branch]
+	sort = -committerdate
+
+[help]
+	autocorrect = prompt
+
+# delta pager — falls back to less if delta isn't installed
+[pager]
+	diff = delta
+	log = delta
+	reflog = delta
+	show = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	line-numbers = true
+	side-by-side = false
+
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential
